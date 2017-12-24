@@ -1,5 +1,11 @@
 {
   "rules": {
+    "messages": {
+      "queue": {
+        ".write": true,
+        ".read": true
+      }
+    },
     ".read": "auth != null",
     ".write": "auth != null"
   }

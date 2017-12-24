@@ -37,17 +37,18 @@
   <body>
     <div id="message">
       <h2>BONJO'S KERST TRUI</h2>
-       <input id="input" type="text" placeholder="typ wat leuks <3"/>
-       <a id="buttonn" href="#" onclick="javascript:addMessage();">STUUR</a>
-      <!-- <p id="para">whatsapp '@trui <je bericht>' naar mij of gebruik deze kekke handige knop hieronder.</p>
-      <a id="buttonn" href="https://api.whatsapp.com/send?phone=31617446055&text=@trui%20">WHATSAPP ME</a> -->
+      <p id="para">whatsapp '@trui <je bericht>' naar mij of gebruik deze kekke handige knop hieronder.</p>
+      <a id="buttonn" href="https://api.whatsapp.com/send?phone=31617446055&text=@trui%20">WHATSAPP ME</a>
+      <p><a href="/manual.html"> Of stuur ouderwets via een formuliertje </a></p>
+      <!-- <input id="input" type="text" placeholder="typ wat leuks <3"/>
+      <a id="buttonn" href="#" onclick="javascript:addMessage();">STUUR</a> -->
     </div>
 
     <script>
       function addMessage() {
         var m = document.getElementById('input').value;
         firebase.database().ref('messages/queue').push({
-           message: m.substring(0,40),
+           message: m,
            time: (new Date).getTime()
         });
 
