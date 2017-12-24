@@ -1,0 +1,21 @@
+{
+  "name": "trui-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "firebase": "^4.8.1",
+    "python-shell": "^0.4.0",
+    "randomcolor": "^0.5.3",
+    "rpi-ws281x-native": "^0.8.2",
+    "sleep-promise": "^2.0.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "sudo nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
