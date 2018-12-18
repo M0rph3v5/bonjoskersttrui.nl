@@ -33,7 +33,7 @@ messagesRef.on("value", function(snapshot) {
     const value = snapshotValue[key];
     messages.push(value);
     firebase.database().ref("messages/processed").push(value);
-    firebase.database().ref("messages/queue/"+key).remove();    
+    firebase.database().ref("messages/queue/"+key).remove();
   }
 
   messages = _.sortBy(messages, function(input) {
@@ -239,7 +239,7 @@ function draw() {
   ws281x.render(pixelData);
   setTimeout(draw, 15)
 }
-setTimeout(draw, 15)
+// setTimeout(draw, 15)
 
 function clearPixels() {
   for (var i = 0; i < NUM_LEDS; i++) {
