@@ -6,4 +6,4 @@ COPY trui-pi/ .
 
 RUN npm install
 
-#CMD ["node", "app.js"]
+CMD ["node", "app.js"]
