@@ -4,6 +4,8 @@ var ws281x = require('rpi-ws281x-native');
 var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
+var brightness = 1.0;
+
 var NUM_LEDS = 28,
     pixelData = new Uint32Array(NUM_LEDS);
 
@@ -23,6 +25,12 @@ var processingMessage = null;
 var processingIndex = 0;
 
 var runningIdleAnimations = false;
+
+var settingsRef = firebase.database().ref('settings');
+settingsRef.on("value", function(snapshot) {
+  var snapshotValue = snapshot.val();
+  brightness = snapshotValue.brightness;
+});
 
 var messagesRef = firebase.database().ref('messages/queue');
 messagesRef.on("value", function(snapshot) {
@@ -223,7 +231,7 @@ function draw() {
   for (var y = 0; y < 3; y++) {
     for (var x = 0; x < 9; x++) {
       const [r,g,b] = getColor(x, y, t);
-      var color = rgb2Int(fix(g),fix(r),fix(b));
+      var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
 
       var targetLed = xyToLedLookup[y][x];
       if (targetLed.constructor === Array) {
