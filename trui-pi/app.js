@@ -103,7 +103,7 @@ var incomingMessage = false;
 function runIdleAnimation() {
   console.log('runIdleAnimation');
   activeAnimation = 'gameoflife';//animations[Math.floor(Math.random()*animations.length)];
-  properties['gameoflife'].game = new GameOfLife(9, 3, properties['gameoflife'].template);
+  properties['gameoflife'].game = new GameOfLife(9, 3);
   console.log("animation " + activeAnimation);
 }
 
@@ -203,17 +203,11 @@ properties['twinkle'] = {
   timeBetweenTwinkles: 1
 };
 properties['gameoflife'] = {
-  template: [
-    false, false, false, false, true, false, false, false, false,
-    false, false, false, true, true, false, false, false, false,
-    false, false, false, false, false, false, false, false, false,
-  ],
   lastTime: new Date/1000,
   timeBetween: 1
 };
 
 function setLedToColor(x,y,color) {
-  console.log('setting ' + x + ' ' + y + ' ' + color);
   var targetLed = xyToLedLookup[y][x];
   if (targetLed.constructor === Array) {
     pixelData[targetLed[0]] = pixelData[targetLed[1]] = color;
@@ -288,7 +282,6 @@ function draw() {
         props.lastTime = t;
         var currentCycle = props.game.cycle();
         props.game.setMap(currentCycle.map);
-
         for(var led = 0; led < 27; led++) {
           var x = Math.floor(led % 9);
           var y = Math.floor(led / 9);
