@@ -239,7 +239,7 @@ function draw() {
   ws281x.render(pixelData);
   setTimeout(draw, 15)
 }
-// setTimeout(draw, 15)
+setTimeout(draw, 15)
 
 function clearPixels() {
   for (var i = 0; i < NUM_LEDS; i++) {
