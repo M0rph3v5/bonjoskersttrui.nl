@@ -91,35 +91,15 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue'];
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle'];
 var activeAnimation = null;
 
 var incomingMessage = false;
 
 function runIdleAnimation() {
   console.log('runIdleAnimation');
-  activeAnimation = animations[Math.floor(Math.random()*animations.length)];
+  activeAnimation = 'twinkle';//animations[Math.floor(Math.random()*animations.length)];
   console.log("animation " + activeAnimation);
-
-  // var rcolor = randomColor({
-  //    luminosity: 'bright',
-  //    format: 'rgbArray'
-  // });
-  //
-  // var rcolor2 = randomColor({
-  //    luminosity: 'bright',
-  //    format: 'rgbArray'
-  // });
-  //
-  // for (var i = 0; i < NUM_LEDS; i++) {
-  //   var c = i%2 ? rcolor : rcolor2;
-  //   pixelData[i] = rgb2Int(c[0],c[1],c[2]);
-  //   ws281x.render(pixelData);
-  //   await Promise.delay(100);
-  // }
-  //
-  // await Promise.delay(1000);
-  // runningIdleAnimations = false;
 }
 
 function update() {
@@ -197,6 +177,8 @@ function getColor(x, y, t) {
     case 'flash':
       var f = (1 - Math.abs(1 - t*3) % 1)*0.5;
       return [f*(1.5+Math.sin(x*5+y+t)), f*(1.5+Math.sin(x*3-y+1+t)), f*(1.5+Math.sin(-x*9+y+2+t))]
+    default:
+      return [1,1,1];
   }
 }
 
@@ -207,10 +189,27 @@ function fix(v) {
 var flashRunsForHits = 80;
 var currentHits = 0;
 
-function draw() {
+var properties = [];
+properties['twinkle'] = {
+  activeLeds: [],
+  lastTime: new Date/1000,
+  numberOfTwinkles: 5,
+  timeBetweenTwinkles: 1
+};
 
+function setLedToColor(x,y,color) {
+  var targetLed = xyToLedLookup[y][x];
+  if (targetLed.constructor === Array) {
+    pixelData[targetLed[0]] = pixelData[targetLed[1]] = color;
+  } else {
+    pixelData[targetLed] = color;
+  }
+}
+
+var drawStepTime = 15;
+function draw() {
   if (!runningIdleAnimations && !incomingMessage) {
-    setTimeout(draw, 15)
+    setTimeout(draw, drawStepTime)
     return;
   }
 
@@ -222,7 +221,7 @@ function draw() {
     incomingMessage = false;
     currentHits = 0;
     clearPixels();
-    setTimeout(draw, 15)
+    setTimeout(draw, drawStepTime)
     return;
   }
 
@@ -232,22 +231,44 @@ function draw() {
     for (var x = 0; x < 9; x++) {
       const [r,g,b] = getColor(x, y, t);
       var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
-
-      var targetLed = xyToLedLookup[y][x];
-      if (targetLed.constructor === Array) {
-        pixelData[targetLed[0]] = pixelData[targetLed[1]] = color;
-      } else {
-        pixelData[targetLed] = color;
-      }
-
+      setLedToColor(x,y,color);
       i++;
     }
   }
 
+  var props = properties[activeAnimation];
+  switch(activeAnimation) {
+    case 'twinkle':
+      if (props.activeLeds.length < props.numberOfTwinkles && t - props.lastTime > props.timeBetweenTwinkles) {
+        props.lastTime = t;
+        props.timeBetweenTwinkles = Math.random() * 1.5 + 0.2;
+        var randomLED = Math.floor(Math.random()*26);
+        props.activeLeds.push({
+          x: Math.floor(randomLED % 9),
+          y: Math.floor(randomLED / 9),
+          brightness: 1.0
+        });
+      }
+
+      for (var led = 0; led < props.activeLeds.length; led++) {
+        var al = props.activeLeds[led];
+        al.brightness -= 0.01;
+
+        const [r,g,b] = [al.brightness, al.brightness, 0.5 * al.brightness]
+        const color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
+        setLedToColor(al.x, al.y, color);
+
+        if (al.brightness <= 0) {
+          props.activeLeds.splice(led, 1);
+        }
+      }
+      break;
+  }
+
   ws281x.render(pixelData);
-  setTimeout(draw, 15)
+  setTimeout(draw, drawStepTime)
 }
-setTimeout(draw, 15)
+setTimeout(draw, drawStepTime)
 
 function clearPixels() {
   for (var i = 0; i < NUM_LEDS; i++) {
