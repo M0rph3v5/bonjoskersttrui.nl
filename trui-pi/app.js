@@ -4,6 +4,8 @@ var ws281x = require('rpi-ws281x-native');
 var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
+const GameOfLife = require('life-game');
+
 var brightness = 1.0;
 var charlimit = 84;
 
@@ -93,14 +95,15 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle'];
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'gameoflife'];
 var activeAnimation = null;
 
 var incomingMessage = false;
 
 function runIdleAnimation() {
   console.log('runIdleAnimation');
-  activeAnimation = animations[Math.floor(Math.random()*animations.length)];
+  activeAnimation = 'gameoflife';//animations[Math.floor(Math.random()*animations.length)];
+  properties['gameoflife'].game = new GameOfLife(9, 3, properties['gameoflife'].template);
   console.log("animation " + activeAnimation);
 }
 
@@ -199,6 +202,15 @@ properties['twinkle'] = {
   numberOfTwinkles: 8,
   timeBetweenTwinkles: 1
 };
+properties['gameoflife'] = {
+  template: [
+    false, false, false, false, false, false, false, false, false,
+    false, false, false, true, true, false, false, false, false,
+    false, false, false, false, false, false, false, false, false,
+  ],
+  lastTime: new Date/1000,
+  timeBetween: 1
+};
 
 function setLedToColor(x,y,color) {
   var targetLed = xyToLedLookup[y][x];
@@ -267,6 +279,19 @@ function draw() {
 
         if (al.brightness <= 0) {
           props.activeLeds.splice(led, 1);
+        }
+      }
+      break;
+      case 'gameoflife':
+      if (t - props.lastTime > props.timeBetween) {
+        props.lastTime = t;
+        var currentCycle = props.game.cycle();
+        props.game.setMap(currentCycle.map);
+
+        for(var led = 0; led < 27; led++) {
+          var x = Math.floor(led % 9);
+          var y = Math.floor(led / 9);
+          setLedToColor(x, y, props.game.map[led] ? rgb2Int(1*brightness,0,0) : rgb2Int(0,1*brightness,0))
         }
       }
       break;

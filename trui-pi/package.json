@@ -6,6 +6,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "firebase": "^4.8.1",
+    "life-game": "^1.0.75",
     "python-shell": "^0.4.0",
     "randomcolor": "^0.5.3",
     "rpi-ws281x-native": "git://github.com:M0rph3v5/node-rpi-ws281x-native.git",
