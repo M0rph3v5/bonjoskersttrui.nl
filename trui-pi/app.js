@@ -167,10 +167,10 @@ function getColor(x, y, t) {
       return [1.2 - Math.abs(x - (4 + Math.sin(t*2)*5))*(0.4 + 0.1*Math.abs(1 - y)), 0, 0];
     case 'scan':
       var d = Math.abs(y - 1 - 3*Math.sin(t*5) + x/5*Math.sin(t));
-      return [1 - d, 2 - d, 1.7 - d];
+      return [3 - d, 1 - d, 1.7 - d];
     case 'tunnel':
       var d = Math.sqrt(Math.pow(x - 4, 2) + Math.pow(y - 1, 2)*5);
-      return [Math.sin(d - t*10), Math.sin(d - t*10 + 0.1), Math.sin(d - t*10 + 0.2)]
+      return [Math.sin(d - t*2), Math.sin(d - t*3 + 0.1), Math.sin(d - t*1 + 0.2)]
     case 'hue':
       var d = Math.sqrt(Math.pow(x - 4 + Math.sin(t/2.1)*2, 2) + Math.pow(y - 1 + Math.sin(t/5.5), 2)*5);
       return [Math.sin(d+t*5)*0.5 + 0.5, Math.sin(d+t*5 + 1)*0.5 + 0.5, Math.sin(d+t*5 + 2)*0.5 + 0.5]
@@ -178,7 +178,7 @@ function getColor(x, y, t) {
       var f = (1 - Math.abs(1 - t*3) % 1)*0.5;
       return [f*(1.5+Math.sin(x*5+y+t)), f*(1.5+Math.sin(x*3-y+1+t)), f*(1.5+Math.sin(-x*9+y+2+t))]
     default:
-      return [1,1,1];
+      return [0,0,0];
   }
 }
 
