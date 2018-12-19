@@ -204,7 +204,7 @@ properties['twinkle'] = {
 };
 properties['gameoflife'] = {
   template: [
-    false, false, false, false, false, false, false, false, false,
+    false, false, false, false, true, false, false, false, false,
     false, false, false, true, true, false, false, false, false,
     false, false, false, false, false, false, false, false, false,
   ],
@@ -213,6 +213,7 @@ properties['gameoflife'] = {
 };
 
 function setLedToColor(x,y,color) {
+  console.log('setting ' + x + ' ' + y + ' ' + color);
   var targetLed = xyToLedLookup[y][x];
   if (targetLed.constructor === Array) {
     pixelData[targetLed[0]] = pixelData[targetLed[1]] = color;
@@ -291,7 +292,7 @@ function draw() {
         for(var led = 0; led < 27; led++) {
           var x = Math.floor(led % 9);
           var y = Math.floor(led / 9);
-          setLedToColor(x, y, props.game.map[led] ? rgb2Int(1*brightness,0,0) : rgb2Int(0,1*brightness,0))
+          setLedToColor(x, y, currentCycle.map[led] ? rgb2Int(255*brightness,0,0) : rgb2Int(0,255*brightness,0))
         }
       }
       break;
