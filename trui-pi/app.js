@@ -125,6 +125,7 @@ function update() {
 
   if (processingMessage == null) {
     processingMessage = queueToProcess[0];
+    processingMessage.message = processingMessage.message.substring(0, 84);
     processingIndex = 0;
     queueToProcess.shift();
   } else {
