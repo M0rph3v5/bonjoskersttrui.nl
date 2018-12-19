@@ -5,6 +5,7 @@ var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
 var brightness = 1.0;
+var charlimit = 84;
 
 var NUM_LEDS = 28,
     pixelData = new Uint32Array(NUM_LEDS);
@@ -30,6 +31,7 @@ var settingsRef = firebase.database().ref('settings');
 settingsRef.on("value", function(snapshot) {
   var snapshotValue = snapshot.val();
   brightness = snapshotValue.brightness;
+  charlimit = snapshotValue.charlimit;
 });
 
 var messagesRef = firebase.database().ref('messages/queue');
@@ -98,7 +100,7 @@ var incomingMessage = false;
 
 function runIdleAnimation() {
   console.log('runIdleAnimation');
-  activeAnimation = 'twinkle';//animations[Math.floor(Math.random()*animations.length)];
+  activeAnimation = animations[Math.floor(Math.random()*animations.length)];
   console.log("animation " + activeAnimation);
 }
 
@@ -179,7 +181,7 @@ function getColor(x, y, t) {
       var f = (1 - Math.abs(1 - t*3) % 1)*0.5;
       return [f*(1.5+Math.sin(x*5+y+t)), f*(1.5+Math.sin(x*3-y+1+t)), f*(1.5+Math.sin(-x*9+y+2+t))]
     default:
-      return [0,0,0];
+      return false;
   }
 }
 
@@ -194,7 +196,7 @@ var properties = [];
 properties['twinkle'] = {
   activeLeds: [],
   lastTime: new Date/1000,
-  numberOfTwinkles: 5,
+  numberOfTwinkles: 8,
   timeBetweenTwinkles: 1
 };
 
@@ -230,7 +232,11 @@ function draw() {
   var i = 0;
   for (var y = 0; y < 3; y++) {
     for (var x = 0; x < 9; x++) {
-      const [r,g,b] = getColor(x, y, t);
+      var result = getColor(x, y, t);
+      if (!result) {
+        continue;
+      }
+      const [r,g,b] = result;
       var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
       setLedToColor(x,y,color);
       i++;
@@ -242,7 +248,7 @@ function draw() {
     case 'twinkle':
       if (props.activeLeds.length < props.numberOfTwinkles && t - props.lastTime > props.timeBetweenTwinkles) {
         props.lastTime = t;
-        props.timeBetweenTwinkles = Math.random() * 1.5 + 0.2;
+        props.timeBetweenTwinkles = Math.random() * 1.0 + 0.2;
         var randomLED = Math.floor(Math.random()*26);
         props.activeLeds.push({
           x: Math.floor(randomLED % 9),
@@ -255,7 +261,7 @@ function draw() {
         var al = props.activeLeds[led];
         al.brightness -= 0.01;
 
-        const [r,g,b] = [al.brightness, al.brightness, 0.5 * al.brightness]
+        const [r,g,b] = [al.brightness, al.brightness, al.brightness]
         const color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
         setLedToColor(al.x, al.y, color);
 
