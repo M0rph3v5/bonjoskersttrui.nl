@@ -145,7 +145,6 @@ function update() {
 
     switch(processingMessage.type) {
       case "text":
-        processingIndex++;
         if (processingIndex >= processingMessage.payload.length) {
           processingMessage = null;
           clearPixels();
@@ -169,6 +168,7 @@ function update() {
         ws281x.render(pixelData);
 
         console.log('letter ' + letter + ' ' + led);
+        processingIndex++;
       break;
       case "animation":
         runIdleAnimation(processingMessage.payload);
