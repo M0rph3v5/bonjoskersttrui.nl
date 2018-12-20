@@ -219,7 +219,7 @@ var properties = [];
 properties['twinkle'] = {
   activeLeds: [],
   lastTime: new Date/1000,
-  numberOfTwinkles: 8,
+  numberOfTwinkles: 12,
   timeBetweenTwinkles: 1
 };
 properties['gameoflife'] = {
