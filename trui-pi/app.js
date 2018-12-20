@@ -36,6 +36,18 @@ settingsRef.on("value", function(snapshot) {
   charlimit = snapshotValue.charlimit;
 });
 
+var hueRef = firebase.database().ref('hue/state');
+hueRef.on("value", function(snapshot) {
+  var snapshotValue = snapshot.val();
+  if (snapshotValue == null) {
+    return;
+  }
+  
+  if (snapshotValue.bri != null) {
+      brightness = snapshotValue.bri / 255;
+  }
+});
+
 var messagesRef = firebase.database().ref('messages/queue');
 messagesRef.on("value", function(snapshot) {
   var messages = [];
