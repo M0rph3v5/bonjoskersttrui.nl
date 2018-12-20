@@ -158,6 +158,7 @@ function update() {
 
         var letter = processingMessage.payload.charAt(processingIndex).toLowerCase();
         var led = letterToLedLookup[letter];
+        processingIndex++;
         if (led === undefined) {
           clearPixels();
           return;
@@ -172,7 +173,7 @@ function update() {
         ws281x.render(pixelData);
 
         console.log('letter ' + letter + ' ' + led);
-        processingIndex++;
+
       break;
       case "animation":
         overrideAnim = true;
