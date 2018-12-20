@@ -95,14 +95,20 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'gameoflife'];
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle']; // 'gameoflife'
 var activeAnimation = null;
 
 var incomingMessage = false;
 
-function runIdleAnimation() {
+function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
-  activeAnimation = 'gameoflife';//animations[Math.floor(Math.random()*animations.length)];
+
+  if (anim == null) {
+      activeAnimation = animations[Math.floor(Math.random()*animations.length)];
+  } else {
+      activeAnimation = anim;
+  }
+
   properties['gameoflife'].game = new GameOfLife(9, 3);
   console.log("animation " + activeAnimation);
 }
@@ -130,35 +136,47 @@ function update() {
 
   if (processingMessage == null) {
     processingMessage = queueToProcess[0];
-    processingMessage.message = processingMessage.message.substring(0, 84);
+    if (processingMessage.type == "text") {
+        processingMessage.payload = processingMessage.payload.substring(0, charlimit);
+    }
     processingIndex = 0;
     queueToProcess.shift();
   } else {
-    processingIndex++;
-    if (processingIndex >= processingMessage.message.length) {
-      processingMessage = null;
-      clearPixels();
-      console.log('done');
-      return;
+
+    switch(processingMessage.type) {
+      case "text":
+        processingIndex++;
+        if (processingIndex >= processingMessage.payload.length) {
+          processingMessage = null;
+          clearPixels();
+          console.log('done');
+          return;
+        }
+
+        var letter = processingMessage.payload.charAt(processingIndex).toLowerCase();
+        var led = letterToLedLookup[letter];
+        if (led === undefined) {
+          clearPixels();
+          return;
+        }
+
+        clearPixels();
+        var rcolor = randomColor({
+           luminosity: 'bright',
+           format: 'rgbArray'
+        });
+        pixelData[led] = rgb2Int(rcolor[0],rcolor[1],rcolor[2]);
+        ws281x.render(pixelData);
+
+        console.log('letter ' + letter + ' ' + led);
+      break;
+      case "animation":
+        runIdleAnimation(processingMessage.payload);
+      break;
     }
+
   }
 
-  var letter = processingMessage.message.charAt(processingIndex).toLowerCase();
-  var led = letterToLedLookup[letter];
-  if (led === undefined) {
-    clearPixels();
-    return;
-  }
-
-  clearPixels();
-  var rcolor = randomColor({
-     luminosity: 'bright',
-     format: 'rgbArray'
-  });
-  pixelData[led] = rgb2Int(rcolor[0],rcolor[1],rcolor[2]);
-  ws281x.render(pixelData);
-
-  console.log('letter ' + letter + ' ' + led);
 }
 setInterval(update, 1000);
 
@@ -169,6 +187,8 @@ process.on('SIGINT', function () {
 
 function getColor(x, y, t) {
   switch (activeAnimation) {
+    case 'fire':
+      return [y / 3 * (Math.cos(t*3) + 0.1),y / 3 * (Math.cos(t*3) + 0.1),0];
     case 'kit':
       return [1.2 - Math.abs(x - (4 + Math.sin(t*2)*5))*(0.4 + 0.1*Math.abs(1 - y)), 0, 0];
     case 'scan':

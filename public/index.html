@@ -47,8 +47,9 @@
       function addMessage() {
         var m = document.getElementById('input').value;
         firebase.database().ref('messages/queue').push({
-           message: m.substring(0,40),
-           time: (new Date).getTime()
+           payload: m.substring(0,40),
+           time: (new Date).getTime(),
+           type: "text"
         });
 
         document.getElementById('input').remove();
