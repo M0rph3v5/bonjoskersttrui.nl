@@ -100,6 +100,8 @@ var activeAnimation = null;
 
 var incomingMessage = false;
 
+var overrideAnim = false;
+
 function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
 
@@ -116,8 +118,10 @@ function runIdleAnimation(anim = null) {
 function update() {
   if (processingMessage == null && queueToProcess.length == 0) {
     if (!runningIdleAnimations) {
-        runIdleAnimation();
-        runningIdleAnimations = true;
+        if (!overrideAnim) {
+          runIdleAnimation();
+          runningIdleAnimations = true;
+        }
     }
     return;
   }
@@ -136,13 +140,13 @@ function update() {
 
   if (processingMessage == null) {
     processingMessage = queueToProcess[0];
+    overrideAnim = false;
     if (processingMessage.type == "text") {
         processingMessage.payload = processingMessage.payload.substring(0, charlimit);
     }
     processingIndex = 0;
     queueToProcess.shift();
   } else {
-
     switch(processingMessage.type) {
       case "text":
         if (processingIndex >= processingMessage.payload.length) {
@@ -171,10 +175,11 @@ function update() {
         processingIndex++;
       break;
       case "animation":
+        overrideAnim = true;
         runIdleAnimation(processingMessage.payload);
+        processingMessage = null;
       break;
     }
-
   }
 
 }
