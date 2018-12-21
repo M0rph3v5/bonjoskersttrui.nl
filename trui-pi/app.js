@@ -364,7 +364,7 @@ function draw() {
           var rgb = colors[colorindex].split("(")[1].split(")")[0];
           rgb = rgb.split(",")
 
-          var f = rgb2Int(0,fix(colorindex)*brightness,0);
+          var f = rgb2Int(fix(rgb[1]/255)*brightness,fix(rgb[0]/255)*brightness,fix(rgb[2]/255)*brightness);
           // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
