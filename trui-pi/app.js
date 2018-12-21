@@ -115,7 +115,7 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'fire']; // 'gameoflife', 'fire'
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'fire', 'gameoflife']; // 'gameoflife', 'fire'
 var activeAnimation = null;
 
 var incomingMessage = false;
@@ -126,7 +126,7 @@ function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
 
   if (anim == null) {
-      activeAnimation = 'fire';//animations[Math.floor(Math.random()*animations.length)];
+      activeAnimation = animations[Math.floor(Math.random()*animations.length)];
   } else {
       activeAnimation = anim;
   }
@@ -278,6 +278,8 @@ function setLedToColor(x,y,color) {
   }
 }
 
+var lastCycle = [];
+
 var drawStepTime = 15;
 function draw() {
     if (!runningIdleAnimations && !incomingMessage) {
@@ -364,7 +366,7 @@ function draw() {
           var rgb = colors[colorindex].split("(")[1].split(")")[0];
           rgb = rgb.split(",")
 
-          var f = rgb2Int(fix(rgb[1])*brightness,fix(rgb[0])*brightness,fix(rgb[2])*brightness);
+          var f = rgb2Int(0,fix(colorindex)*brightness,0);
           // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
@@ -400,11 +402,23 @@ function draw() {
         if (t - props.lastTime > props.timeBetween) {
           props.lastTime = t;
           var currentCycle = props.game.cycle();
+
+          var done = false;
+          if (lastCycle.map.toString() === currentCycle.map.toString()) {
+            done = true;
+          }
+          lastCycle = currentCycle;
+
           props.game.setMap(currentCycle.map);
           for(var led = 0; led < 27; led++) {
             var x = Math.floor(led % 9);
             var y = Math.floor(led / 9);
             setLedToColor(x, y, currentCycle.map[led] ? rgb2Int(255*brightness,0,0) : rgb2Int(0,255*brightness,0))
+          }
+
+          if (done) {
+            console.log('done');
+            properties['gameoflife'].game = new GameOfLife(9, 3);
           }
         }
       break;
