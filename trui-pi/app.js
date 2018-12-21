@@ -362,12 +362,13 @@ function draw() {
           // Scale the heat value from 0-255 down to 0-240
           // for best results with color palettes.
           var colorindex = Math.floor(convertRange(props.heat[j], [0,255], [0,240]));
-          var rgb = colors[colorindex].split("(")[1].split(")")[0];;
+          var rgb = colors[colorindex].split("(")[1].split(")")[0];
           rgb = rgb.split(",")
+          console.log(rgb)
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          const color = rgb2Int(fix(parseInt(rgb[0]))*brightness,fix(parseInt(rgb[1]))*brightness,fix(parseInt(rgb[2]))*brightness);
+          const color = rgb2Int(fix(parseInt(rgb[0]))*brightness,0,0);
 
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
