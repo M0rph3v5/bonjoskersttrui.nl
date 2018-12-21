@@ -5,14 +5,14 @@ var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
 const GameOfLife = require('life-game');
-// const gradient = require('gradient-color')
+const gradient = require('gradient-color')
 
-// const colors = gradient.default([
-//   '#000000',
-//   '#FF0000',
-//   '#FFFF00',
-//   '#FFFFFF'
-// ], 255)
+const colors = gradient.default([
+  '#000000',
+  '#FF0000',
+  '#FFFF00',
+  '#FFFFFF'
+], 255)
 
 var brightness = 1.0;
 var charlimit = 84;
@@ -257,8 +257,10 @@ properties['fire'] = {
 properties['flash'] = {
   colors: [
     [255,0,0],
-    [0,255,0],
+    [255,120,120],
     [255,255,255],
+    [116,214,128],
+    [55,139,41]
   ],
   ledColors: []
 };
@@ -359,14 +361,11 @@ function draw() {
           // Scale the heat value from 0-255 down to 0-240
           // for best results with color palettes.
           var colorindex = Math.floor(convertRange(props.heat[j], [0,255], [0,240]));
-          // var rgb = colors[colorindex].split("(")[1].split(")")[0];
-          // rgb = rgb.split(",")
+          var rgb = colors[colorindex].split("(")[1].split(")")[0];
+          rgb = rgb.split(",")
 
-          // var rgb = convert.hex.rgb(c);
-          // leds[j] = ColorFromPalette( gPal, colorindex);
-
-          var f = rgb2Int(255,0,0);
-          // console.log(colorindex)
+          var f = rgb2Int(fix(rgb[1])*brightness,fix(rgb[0])*brightness,fix(rgb[2])*brightness);
+          // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
           setLedToColor(x, y, f);
@@ -428,7 +427,7 @@ function draw() {
           var z = Math.sin(t*20) * 0.5 + 0.5;
 
           // const c = `rgb(${fix(rgb[0]/255*brightness*z)},${fix(rgb[1]/255*brightness*z)},${fix(rgb[2]/255*brightness*z)})`;
-          var color = rgb2Int(fix(rgb[0])*brightness*z,fix(rgb[1])*brightness*z,fix(rgb[2])*brightness*z);
+          var color = rgb2Int(fix(rgb[1])*brightness*z,fix(rgb[0])*brightness*z,fix(rgb[2])*brightness*z);
 
           var x = Math.floor(led % 9);
           var y = Math.floor(led / 9);
