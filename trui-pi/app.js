@@ -365,7 +365,7 @@ function draw() {
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          var f = rgb2Int(colorindex/255*brightness,0,0);
+          var f = rgb2Int(colorindex*brightness,0,0);
           // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
