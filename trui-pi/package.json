@@ -6,6 +6,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "firebase": "^4.8.1",
+    "gradient-color": "^2.0.1",
     "life-game": "^1.0.75",
     "python-shell": "^0.4.0",
     "randomcolor": "^0.5.3",

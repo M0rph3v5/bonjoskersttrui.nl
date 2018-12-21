@@ -5,6 +5,14 @@ var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
 const GameOfLife = require('life-game');
+const gradient = require('gradient-color')
+
+const colors = gradient.default([
+  '#000000',
+  '#FF0000',
+  '#FFFF00',
+  '#FFFFFF'
+], 255)
 
 var brightness = 1.0;
 var charlimit = 84;
@@ -124,6 +132,7 @@ function runIdleAnimation(anim = null) {
   }
 
   properties['gameoflife'].game = new GameOfLife(9, 3);
+  properties['fire'].heat = [];
   console.log("animation " + activeAnimation);
 }
 
@@ -181,7 +190,7 @@ function update() {
            luminosity: 'bright',
            format: 'rgbArray'
         });
-        pixelData[led] = rgb2Int(rcolor[0],rcolor[1],rcolor[2]);
+        pixelData[led] = rgb2Int(rcolor[0]*brightness,rcolor[1]*brightness,rcolor[2]*brightness);
         ws281x.render(pixelData);
 
         console.log('letter ' + letter + ' ' + led);
@@ -334,16 +343,23 @@ function draw() {
         if( Math.random() * 255 < props.sparking ) {
           var y = Math.floor(Math.random() * 9 + 18);
           props.heat[y] += Math.random() * 95 + 160;
+          if (props.heat[y] > 255) {
+            props.heat[y] = 255;
+          }
         }
 
         // Step 4.  Map from heat cells to LED colors
         for( var j = 0; j < nleds; j++) {
           // Scale the heat value from 0-255 down to 0-240
           // for best results with color palettes.
-          var colorindex = convertRange(props.heat[j], [0,255], [0,240]);
-
+          var colorindex = Math.floor(convertRange(props.heat[j], [0,255], [0,240]));
+          var rgb = colors[colorindex].split("(")[1].split(")")[0];;
+          rgb = rgb.split(",")
+          // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
-          const color = rgb2Int(fix(colorindex)*brightness,fix(colorindex)*brightness * 0.4,0);
+
+          const color = rgb2Int(fix(rgb[0])*brightness,fix(rgb[1])*brightness,fix(rgb[2])*brightness);
+
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
           setLedToColor(x, y, color);
