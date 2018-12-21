@@ -126,13 +126,14 @@ function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
 
   if (anim == null) {
-      activeAnimation = 'fire';//animations[Math.floor(Math.random()*animations.length)];
+      activeAnimation = animations[Math.floor(Math.random()*animations.length)];
   } else {
       activeAnimation = anim;
   }
 
   properties['gameoflife'].game = new GameOfLife(9, 3);
   properties['fire'].heat = [];
+  properties['flash'].ledColors = [];
   console.log("animation " + activeAnimation);
 }
 
@@ -255,6 +256,16 @@ properties['fire'] = {
   cooling: 55,
   sparking: 120,
   heat: []
+};
+properties['flash'] = {
+  colors: [
+   [255,0,0],
+   [255,120,120],
+   [255,255,255],
+   [116,214,128],
+   [55,139,41]
+  ],
+  ledColors: []
 };
 
 function convertRange( value, r1, r2 ) {
@@ -402,6 +413,33 @@ function draw() {
         }
       }
       break;
+    case 'flash':
+      if (props.ledColors.length == 0) {
+          for( var j = 0; j < 27; j++) {
+            props.ledColors[j] = props.colors[Math.floor(Math.random() * props.colors.length)];
+            // console.log(props.ledColors[j])
+          }
+        }
+
+        // console.log(props.ledColors.length)
+
+        for (var led = 0; led < 27; led++) {
+          var x = Math.floor(led % 9);
+          var y = Math.floor(led / 9);
+
+          var rgb = props.ledColors[led];
+
+          var z = Math.sin(t*20) * 0.5 + 0.5;
+
+          // const c = `rgb(${fix(rgb[0]/255*brightness*z)},${fix(rgb[1]/255*brightness*z)},${fix(rgb[2]/255*brightness*z)})`;
+          const color = rgb2Int(fix(rgb[0])*brightness*z,fix(rgb[1])*brightness*z,fix(rgb[2])*brightness*z);
+
+          var x = Math.floor(led % 9);
+          var y = Math.floor(led / 9);
+          setLedToColor(x, y, color);
+        }
+
+    break;
   }
 
   ws281x.render(pixelData);
