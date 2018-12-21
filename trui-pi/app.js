@@ -5,14 +5,14 @@ var randomColor = require('randomcolor');
 var Promise = require("bluebird");
 
 const GameOfLife = require('life-game');
-const gradient = require('gradient-color')
+// const gradient = require('gradient-color')
 
-const colors = gradient.default([
-  '#000000',
-  '#FF0000',
-  '#FFFF00',
-  '#FFFFFF'
-], 255)
+// const colors = gradient.default([
+//   '#000000',
+//   '#FF0000',
+//   '#FFFF00',
+//   '#FFFFFF'
+// ], 255)
 
 var brightness = 1.0;
 var charlimit = 84;
@@ -222,13 +222,10 @@ function getColor(x, y, t) {
       return [3 - d, 1 - d, 1.7 - d];
     case 'tunnel':
       var d = Math.sqrt(Math.pow(x - 4, 2) + Math.pow(y - 1, 2)*5);
-      return [Math.sin(d - t*2), Math.sin(d - t*3 + 0.1), Math.sin(d - t*1 + 0.2)]
+      return [Math.sin(d - t*2), Math.sin(d - t*3 + 0.1), Math.sin(d - t*1 + 0.2)];
     case 'hue':
       var d = Math.sqrt(Math.pow(x - 4 + Math.sin(t/2.1)*2, 2) + Math.pow(y - 1 + Math.sin(t/5.5), 2)*5);
-      return [Math.sin(d+t*5)*0.5 + 0.5, Math.sin(d+t*5 + 1)*0.5 + 0.5, Math.sin(d+t*5 + 2)*0.5 + 0.5]
-    case 'flash':
-      var f = (1 - Math.abs(1 - t*3) % 1)*0.5;
-      return [f*(1.5+Math.sin(x*5+y+t)), f*(1.5+Math.sin(x*3-y+1+t)), f*(1.5+Math.sin(-x*9+y+2+t))]
+      return [Math.sin(d+t*5)*0.5 + 0.5, Math.sin(d+t*5 + 1)*0.5 + 0.5, Math.sin(d+t*5 + 2)*0.5 + 0.5];
     default:
       return false;
   }
@@ -368,7 +365,7 @@ function draw() {
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          var f = rgb2Int(fix(colorindex)*brightness,0,0);
+          var f = rgb2Int(colorindex/255*brightness,0,0);
           // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
@@ -401,16 +398,16 @@ function draw() {
       }
       break;
       case 'gameoflife':
-      if (t - props.lastTime > props.timeBetween) {
-        props.lastTime = t;
-        var currentCycle = props.game.cycle();
-        props.game.setMap(currentCycle.map);
-        for(var led = 0; led < 27; led++) {
-          var x = Math.floor(led % 9);
-          var y = Math.floor(led / 9);
-          setLedToColor(x, y, currentCycle.map[led] ? rgb2Int(255*brightness,0,0) : rgb2Int(0,255*brightness,0))
+        if (t - props.lastTime > props.timeBetween) {
+          props.lastTime = t;
+          var currentCycle = props.game.cycle();
+          props.game.setMap(currentCycle.map);
+          for(var led = 0; led < 27; led++) {
+            var x = Math.floor(led % 9);
+            var y = Math.floor(led / 9);
+            setLedToColor(x, y, currentCycle.map[led] ? rgb2Int(255*brightness,0,0) : rgb2Int(0,255*brightness,0))
+          }
         }
-      }
       break;
     case 'flash':
       if (props.ledColors.length == 0) {
