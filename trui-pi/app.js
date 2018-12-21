@@ -126,7 +126,7 @@ function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
 
   if (anim == null) {
-      activeAnimation = animations[Math.floor(Math.random()*animations.length)];
+      activeAnimation = 'fire';//animations[Math.floor(Math.random()*animations.length)];
   } else {
       activeAnimation = anim;
   }
@@ -259,11 +259,9 @@ properties['fire'] = {
 };
 properties['flash'] = {
   colors: [
-   [255,0,0],
-   [255,120,120],
-   [255,255,255],
-   [116,214,128],
-   [55,139,41]
+    [255,0,0],
+    [0,255,0],
+    [255,255,255],
   ],
   ledColors: []
 };
@@ -369,7 +367,7 @@ function draw() {
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          const color = rgb2Int(fix(rgb[0])*brightness,0,0);
+          const color = rgb2Int(fix(parseInt(rgb[0]))*brightness,fix(parseInt(rgb[1]))*brightness,fix(parseInt(rgb[2]))*brightness);
 
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
