@@ -362,16 +362,17 @@ function draw() {
           // Scale the heat value from 0-255 down to 0-240
           // for best results with color palettes.
           var colorindex = Math.floor(convertRange(props.heat[j], [0,255], [0,240]));
-          var rgb = colors[colorindex].split("(")[1].split(")")[0];
-          rgb = rgb.split(",")
+          // var rgb = colors[colorindex].split("(")[1].split(")")[0];
+          // rgb = rgb.split(",")
 
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          var color = rgb2Int(fix(parseInt(rgb[0]))*brightness,0,0);
+          var f = rgb2Int(fix(colorindex)*brightness,0,0);
+          // console.log(rgb)
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
-          setLedToColor(x, y, color);
+          setLedToColor(x, y, f);
         }
         break;
     case 'twinkle':
