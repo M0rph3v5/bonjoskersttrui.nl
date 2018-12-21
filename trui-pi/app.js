@@ -369,7 +369,7 @@ function draw() {
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          const color = rgb2Int(fix(rgb[0])*brightness,fix(rgb[1])*brightness,fix(rgb[2])*brightness);
+          const color = rgb2Int(fix(rgb[0]/255)*brightness,fix(rgb[1]/255)*brightness,fix(rgb[2]/255)*brightness);
 
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
