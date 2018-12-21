@@ -364,12 +364,11 @@ function draw() {
           var colorindex = Math.floor(convertRange(props.heat[j], [0,255], [0,240]));
           var rgb = colors[colorindex].split("(")[1].split(")")[0];
           rgb = rgb.split(",")
-          console.log(rgb)
+
           // var rgb = convert.hex.rgb(c);
           // leds[j] = ColorFromPalette( gPal, colorindex);
 
-          const color = rgb2Int(fix(parseInt(rgb[0]))*brightness,0,0);
-
+          var color = rgb2Int(fix(parseInt(rgb[0]))*brightness,0,0);
           var x = Math.floor(j % 9);
           var y = Math.floor(j / 9);
           setLedToColor(x, y, color);
@@ -392,7 +391,7 @@ function draw() {
         al.brightness -= 0.01;
 
         const [r,g,b] = [al.brightness, al.brightness, al.brightness]
-        const color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
+        var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
         setLedToColor(al.x, al.y, color);
 
         if (al.brightness <= 0) {
@@ -431,7 +430,7 @@ function draw() {
           var z = Math.sin(t*20) * 0.5 + 0.5;
 
           // const c = `rgb(${fix(rgb[0]/255*brightness*z)},${fix(rgb[1]/255*brightness*z)},${fix(rgb[2]/255*brightness*z)})`;
-          const color = rgb2Int(fix(rgb[0])*brightness*z,fix(rgb[1])*brightness*z,fix(rgb[2])*brightness*z);
+          var color = rgb2Int(fix(rgb[0])*brightness*z,fix(rgb[1])*brightness*z,fix(rgb[2])*brightness*z);
 
           var x = Math.floor(led % 9);
           var y = Math.floor(led / 9);
