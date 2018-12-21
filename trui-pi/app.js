@@ -242,7 +242,7 @@ var properties = [];
 properties['twinkle'] = {
   activeLeds: [],
   lastTime: new Date/1000,
-  numberOfTwinkles: 12,
+  numberOfTwinkles: 16,
   timeBetweenTwinkles: 1
 };
 properties['gameoflife'] = {
@@ -259,8 +259,6 @@ properties['flash'] = {
     [255,0,0],
     [255,120,120],
     [255,255,255],
-    [116,214,128],
-    [55,139,41]
   ],
   ledColors: []
 };
