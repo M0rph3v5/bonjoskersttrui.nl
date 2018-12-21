@@ -432,7 +432,7 @@ function draw() {
           var z = Math.sin(t*20) * 0.5 + 0.5;
 
           // const c = `rgb(${fix(rgb[0]/255*brightness*z)},${fix(rgb[1]/255*brightness*z)},${fix(rgb[2]/255*brightness*z)})`;
-          const color = rgb2Int(fix(rgb[0])*brightness*z,fix(rgb[1])*brightness*z,fix(rgb[2])*brightness*z);
+          const color = rgb2Int(fix(rgb[0]/255)*brightness*z,fix(rgb[1]/255)*brightness*z,fix(rgb[2]/255)*brightness*z);
 
           var x = Math.floor(led % 9);
           var y = Math.floor(led / 9);
