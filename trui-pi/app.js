@@ -42,7 +42,7 @@ hueRef.on("value", function(snapshot) {
   if (snapshotValue == null) {
     return;
   }
-  
+
   if (snapshotValue.bri != null) {
       brightness = snapshotValue.bri / 255;
   }
@@ -107,7 +107,7 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle']; // 'gameoflife'
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle']; // 'gameoflife', 'fire'
 var activeAnimation = null;
 
 var incomingMessage = false;
@@ -118,7 +118,7 @@ function runIdleAnimation(anim = null) {
   console.log('runIdleAnimation');
 
   if (anim == null) {
-      activeAnimation = animations[Math.floor(Math.random()*animations.length)];
+      activeAnimation = 'fire';//animations[Math.floor(Math.random()*animations.length)];
   } else {
       activeAnimation = anim;
   }
@@ -205,8 +205,6 @@ process.on('SIGINT', function () {
 
 function getColor(x, y, t) {
   switch (activeAnimation) {
-    case 'fire':
-      return [y / 3 * (Math.cos(t*3) + 0.1),y / 3 * (Math.cos(t*3) + 0.1),0];
     case 'kit':
       return [1.2 - Math.abs(x - (4 + Math.sin(t*2)*5))*(0.4 + 0.1*Math.abs(1 - y)), 0, 0];
     case 'scan':
@@ -244,6 +242,15 @@ properties['gameoflife'] = {
   lastTime: new Date/1000,
   timeBetween: 1
 };
+properties['fire'] = {
+  cooling: 55,
+  sparking: 120,
+  heat: []
+};
+
+function convertRange( value, r1, r2 ) {
+    return ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
+}
 
 function setLedToColor(x,y,color) {
   var targetLed = xyToLedLookup[y][x];
@@ -256,40 +263,92 @@ function setLedToColor(x,y,color) {
 
 var drawStepTime = 15;
 function draw() {
-  if (!runningIdleAnimations && !incomingMessage) {
-    setTimeout(draw, drawStepTime)
-    return;
-  }
-
-  if (incomingMessage) {
-    currentHits++;
-  }
-
-  if (currentHits > flashRunsForHits && incomingMessage) {
-    incomingMessage = false;
-    currentHits = 0;
-    clearPixels();
-    setTimeout(draw, drawStepTime)
-    return;
-  }
-
-  var t = new Date/1000;
-  var i = 0;
-  for (var y = 0; y < 3; y++) {
-    for (var x = 0; x < 9; x++) {
-      var result = getColor(x, y, t);
-      if (!result) {
-        continue;
-      }
-      const [r,g,b] = result;
-      var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
-      setLedToColor(x,y,color);
-      i++;
+    if (!runningIdleAnimations && !incomingMessage) {
+      setTimeout(draw, drawStepTime)
+      return;
     }
-  }
 
-  var props = properties[activeAnimation];
-  switch(activeAnimation) {
+    if (incomingMessage) {
+      currentHits++;
+    }
+
+    if (currentHits > flashRunsForHits && incomingMessage) {
+      incomingMessage = false;
+      currentHits = 0;
+      clearPixels();
+      setTimeout(draw, drawStepTime)
+      return;
+    }
+
+    var t = new Date/1000;
+    var i = 0;
+    for (var y = 0; y < 3; y++) {
+      for (var x = 0; x < 9; x++) {
+        var result = getColor(x, y, t);
+        if (!result) {
+          continue;
+        }
+        const [r,g,b] = result;
+        var color = rgb2Int(fix(g)*brightness,fix(r)*brightness,fix(b)*brightness);
+        setLedToColor(x,y,color);
+        i++;
+      }
+    }
+
+    var props = properties[activeAnimation];
+    switch(activeAnimation) {
+      case 'fire':
+        // Step 1.  Cool down every cell a little
+        var nleds = 27;
+
+        for( var i = 0; i < nleds; i++) {
+          if (props.heat[i] != undefined) {
+            var value = Math.floor(Math.random() * ((props.cooling * 10) / nleds) + 2);
+            props.heat[i] -= value;
+            if (props.heat[i] < 0) {
+              props.heat[i] = 0;
+            }
+          } else {
+            props.heat[i] = 0;
+          }
+        }
+
+        // Step 2.  Heat from each cell drifts 'up' and diffuses a little
+         for (var y = 0; y < 3; y++) {
+          for (var x = 0; x < 9; x++) {
+            var i = x + 9 * y;
+            if (y == 1) {
+              props.heat[i - 9] = props.heat[i] / 5
+            } else if (y == 2) {
+              props.heat[i - 9] = props.heat[i] / 3
+            }
+          }
+         }
+        // props.heat[18] = 255
+
+        for( var k= nleds - 3; k > 0; k--) {
+          props.heat[k] = props.heat[k];//(props.heat[k - 1] + props.heat[k - 2] + props.heat[k - 2] ) / 3;
+        }
+
+        // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
+        if( Math.random() * 255 < props.sparking ) {
+          var y = Math.floor(Math.random() * 9 + 18);
+          props.heat[y] += Math.random() * 95 + 160;
+        }
+
+        // Step 4.  Map from heat cells to LED colors
+        for( var j = 0; j < nleds; j++) {
+          // Scale the heat value from 0-255 down to 0-240
+          // for best results with color palettes.
+          var colorindex = convertRange(props.heat[j], [0,255], [0,240]);
+
+          // leds[j] = ColorFromPalette( gPal, colorindex);
+          const color = rgb2Int(fix(colorindex)*brightness,fix(colorindex)*brightness * 0.4,0);
+          var x = Math.floor(j % 9);
+          var y = Math.floor(j / 9);
+          setLedToColor(x, y, color);
+        }
+        break;
     case 'twinkle':
       if (props.activeLeds.length < props.numberOfTwinkles && t - props.lastTime > props.timeBetweenTwinkles) {
         props.lastTime = t;
