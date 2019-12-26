@@ -123,7 +123,7 @@ var incomingMessage = false;
 // var overrideAnim = false;
 
 function runIdleAnimation(anim = null) {
-  console.log('runIdleAnimation');
+  console.log('runIdleAnimation ');
 
   if (anim == null) {
       activeAnimation = animations[Math.floor(Math.random()*animations.length)];
@@ -463,4 +463,61 @@ function clearPixels() {
 
 function rgb2Int(r, g, b) {
   return ((r & 0xff) << 16) + ((g & 0xff) << 8) + (b & 0xff);
+}
+
+// BLUETOOTH SHIZZLE
+
+var bleno = require('bleno');
+
+var BlenoPrimaryService = bleno.PrimaryService;
+var Characteristic = require('./characteristics');
+var AnimationCharacteristic = Characteristic.Animation;
+var BrightnessCharacteristic = Characteristic.Brightness;
+var WordCharacteristic = Characteristic.Word;
+
+bleno.on('stateChange', function(state) {
+  console.log('on -> stateChange: ' + state);
+
+  if (state === 'poweredOn') {
+    bleno.startAdvertising('Bonjo\s kersttrui', ['d547cbee-bfd5-4e5c-9248-489bed4517e0']);
+  } else {
+    bleno.stopAdvertising();
+  }
+});
+
+bleno.on('advertisingStart', function(error) {
+  console.log('on -> advertisingStart: ' + (error ? 'error ' + error : 'success'));
+
+  if (!error) {
+    bleno.setServices([
+      new BlenoPrimaryService({
+        uuid: 'd547cbee-bfd5-4e5c-9248-489bed4517e0',
+        characteristics: [
+          new AnimationCharacteristic(changeAnimation),
+          new BrightnessCharacteristic(changeBrightness),
+          new WordCharacteristic(addWordToQueue)
+        ]
+      })
+    ]);
+  }
+});
+
+function changeBrightness(b) {
+  brightness = b/30;
+}
+
+function addWordToQueue(word) {
+  queueToProcess.push({
+    payload: word,
+    time: 0,
+    type: "text"
+  });
+}
+
+function changeAnimation(value) {
+  if (value == 9) { // random
+    runIdleAnimation();
+  } else {
+    runIdleAnimation(animations[value]);
+  }
 }

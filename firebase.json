@@ -5,6 +5,7 @@
   "hosting": {
     "public": "public",
     "ignore": [
+      "trui-pi/**"
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
