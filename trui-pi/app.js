@@ -243,7 +243,7 @@ properties['twinkle'] = {
   activeLeds: [],
   lastTime: new Date/1000,
   numberOfTwinkles: 16,
-  timeBetweenTwinkles: 1
+  timeBetweenTwinkles: 0.1
 };
 properties['gameoflife'] = {
   lastTime: new Date/1000,
