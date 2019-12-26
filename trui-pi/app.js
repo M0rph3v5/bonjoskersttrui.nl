@@ -115,7 +115,7 @@ var xyToLedLookup = [
   [27,26,25,24,23,22,21,20,19],
 ];
 
-var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'fire', 'gameoflife']; // 'gameoflife', 'fire'
+var animations = ['kit', 'scan', 'tunnel', 'hue', 'twinkle', 'fire']; // 'gameoflife', 'fire'
 var activeAnimation = null;
 
 var incomingMessage = false;
