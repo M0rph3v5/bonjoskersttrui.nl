@@ -13,7 +13,7 @@
     "randomcolor": "^0.5.3",
     "rpi-ws281x-native": "git://github.com:M0rph3v5/node-rpi-ws281x-native.git",
     "sleep-promise": "^2.0.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.12.1"
   },
   "devDependencies": {},
   "scripts": {
